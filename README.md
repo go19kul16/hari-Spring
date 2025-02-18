@@ -181,48 +181,42 @@ class Car {
 
 
 
-Bean Management in Spring
+# Bean Management in Spring
 
-What is Bean Management? 🤖
-
+## What is Bean Management? 
 Bean management refers to controlling how objects (beans) are created, used, and destroyed in Spring. Spring handles:
 
-Creation – Automatically creates objects.
+1. **Creation** – Automatically creates objects.
+2. **Injection** – Gives objects to other classes.
+3. **Destruction** – Removes objects when not needed.
 
-Injection – Gives objects to other classes.
+💡 **Think of it like a hotel manager handling customer orders:**
+- Customers (users) order food (beans).
+- The hotel manager (Spring) prepares and serves it.
+- When done, he cleans up (removes unused beans).
 
-Destruction – Removes objects when not needed.
+---
 
-💡 Think of it like a hotel manager handling customer orders:
-
-Customers (users) order food (beans).
-
-The hotel manager (Spring) prepares and serves it.
-
-When done, he cleans up (removes unused beans).
-
-1. BeanFactory
-
+## 1. BeanFactory
 BeanFactory is the basic container in Spring that manages your beans (objects). It is used to configure and manage the beans in your application.
 
-What does it do?
+### What does it do?
+- It creates beans (objects) based on configuration (like XML or annotations).
+- It delays the creation of beans until they are needed (known as **Lazy Initialization**).
 
-It creates beans (objects) based on configuration (like XML or annotations).
+### Example
 
-It delays the creation of beans until they are needed (known as Lazy Initialization).
-
-Example
-
-Java Class representing a bean
-
+#### **Java Class representing a bean**
+```java
 public class MyService {
     public void serve() {
         System.out.println("Service is running!");
     }
 }
+```
 
-Using BeanFactory in Spring
-
+#### **Using BeanFactory in Spring**
+```java
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -234,31 +228,32 @@ public class Main {
         myService.serve();
     }
 }
+```
 
-beans.xml Configuration
-
+#### **beans.xml Configuration**
+```xml
 <beans>
     <bean id="myService" class="MyService"/>
 </beans>
+```
 
-In this case, the MyService bean is created only when we request it using factory.getBean("myService").
+In this case, the `MyService` bean is created **only when we request it** using `factory.getBean("myService")`.
 
-⚠️ Note: BeanFactory is considered somewhat outdated. Nowadays, ApplicationContext is commonly used in Spring.
+⚠️ **Note:** BeanFactory is considered somewhat outdated. Nowadays, **ApplicationContext** is commonly used in Spring.
 
-2. ApplicationContext
+---
 
-ApplicationContext is an advanced version of BeanFactory. It’s a more powerful container and includes additional features like event propagation, bean post-processing, and easier integration with Spring’s AOP (Aspect-Oriented Programming).
+## 2. ApplicationContext
+**ApplicationContext** is an advanced version of **BeanFactory**. It’s a more powerful container and includes additional features like event propagation, bean post-processing, and easier integration with Spring’s **AOP** (Aspect-Oriented Programming).
 
-What does it do?
+### What does it do?
+- Manages beans just like BeanFactory, but with **more features**.
+- Supports **eager initialization** (beans are created as soon as the application context is created).
+- Provides additional functionalities like **message resources (internationalization)** and **event handling**.
 
-Manages beans just like BeanFactory, but with more features.
+### Example
 
-Supports eager initialization (beans are created as soon as the application context is created).
-
-Provides additional functionalities like message resources (internationalization) and event handling.
-
-Example
-
+```java
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -272,35 +267,34 @@ public class Main {
         myService.serve();
     }
 }
+```
 
-beans.xml Configuration
-
+#### **beans.xml Configuration**
+```xml
 <beans>
     <bean id="myService" class="MyService"/>
 </beans>
+```
 
-Additional Features of Spring Bean Management
+---
 
-Event Handling: Spring lets your app listen to and react to events (like a "UserLoggedIn" event triggering a welcome message).
+## Additional Features of Spring Bean Management
 
-Internationalization (I18N): Spring helps your app support multiple languages so that you can show messages in the user's preferred language.
+1. **Event Handling**: Spring lets your app listen to and react to events (like a "UserLoggedIn" event triggering a welcome message).
+2. **Internationalization (I18N)**: Spring helps your app support multiple languages so that you can show messages in the user's preferred language.
+3. **AOP (Aspect-Oriented Programming)**: Spring helps you add extra functionality (like logging or security) to your app without repeating code all over the place.
 
-AOP (Aspect-Oriented Programming): Spring helps you add extra functionality (like logging or security) to your app without repeating code all over the place.
+---
 
-1️⃣ Bean Creation (How are beans made?)
-
+## 1️⃣ Bean Creation (How are beans made?)
 Spring automatically creates beans using:
+- `@Component`
+- `@Service`
+- `@Repository`
+- `@Bean` (inside a config class)
 
-@Component
-
-@Service
-
-@Repository
-
-@Bean (inside a config class)
-
-Example
-
+### Example
+```java
 @Component
 class Engine {
     public void start() {
@@ -321,39 +315,24 @@ class Car {
         engine.start();
     }
 }
+```
 
-Spring automatically injects Engine into Car.
+- Spring **automatically injects** `Engine` into `Car`.
+- You **don’t need to manually create objects** (`new Engine()`).
+- **Beans have lifespans** (like humans):
 
-You don’t need to manually create objects (new Engine()).
+| Scope       | Meaning |
+|------------|---------|
+| **singleton (default)** | One bean for the whole app (like a single kitchen in a hotel) |
+| **prototype** | New bean every time you ask (like a fresh pizza for each order) |
+| **request** | One bean per HTTP request (used in web apps) |
+| **session** | One bean per user session (used in web apps) |
 
-Beans have lifespans (like humans):
+### Bean Cleanup (Destroying Beans)
+When the app closes, Spring removes unused beans **automatically**. But you can also define **cleanup methods**.
 
-Scope
-
-Meaning
-
-singleton (default)
-
-One bean for the whole app (like a single kitchen in a hotel)
-
-prototype
-
-New bean every time you ask (like a fresh pizza for each order)
-
-request
-
-One bean per HTTP request (used in web apps)
-
-session
-
-One bean per user session (used in web apps)
-
-Bean Cleanup (Destroying Beans)
-
-When the app closes, Spring removes unused beans automatically. But you can also define cleanup methods.
-
-Example:
-
+#### Example:
+```java
 @Component
 class DatabaseConnection {
     
@@ -362,17 +341,20 @@ class DatabaseConnection {
         System.out.println("Database connection closed.");
     }
 }
+```
 
-📌 Summary
+---
 
-✅ Bean Management: Controls how objects are created, used, and destroyed in Spring.
-✅ BeanFactory: Basic container for managing beans (lazy initialization, now less used).
-✅ ApplicationContext: Advanced container with more features (eager initialization, event handling, AOP, I18N).
-✅ Spring creates beans using @Component, @Service, @Repository, and @Bean.
-✅ Bean Scopes: singleton, prototype, request, session.
-✅ Bean Cleanup: @PreDestroy allows cleanup before beans are removed.
+## 📌 Summary
 
-🚀 Spring makes managing objects easier! 🎯
+✅ **Bean Management**: Controls how objects are created, used, and destroyed in Spring.
+✅ **BeanFactory**: Basic container for managing beans (lazy initialization, now less used).
+✅ **ApplicationContext**: Advanced container with more features (eager initialization, event handling, AOP, I18N).
+✅ **Spring creates beans** using `@Component`, `@Service`, `@Repository`, and `@Bean`.
+✅ **Bean Scopes**: `singleton`, `prototype`, `request`, `session`.
+✅ **Bean Cleanup**: `@PreDestroy` allows cleanup before beans are removed.
+
+🚀 **Spring makes managing objects easier!** 🎯
 
 
 
